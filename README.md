@@ -13,20 +13,24 @@ My program has an internal copy of this table, with an additional bracket added 
 The table in the webpage is operated by a Javascript (+JQuery) front-end, while the algorithm is contained in the Python (+Flask) back-end. 
 
 ##### Modules Used
-	Flask, Arrow, Nose (testing)
-	JQuery, Moment
+* Flask, Arrow, Nose (testing)
+* JQuery, Moment
 
 ##### Author Info
-	Chase Maslow
-	chasemaslow@gmail.com
+* Chase Maslow
+* chasemaslow@gmail.com
 
 ## How to start
 
 #### Docker 
 Go into your terminal or shell and navigate to the /brevets directory. With Docker installed, enter:
+
 	`docker build -t {choose name here} .`
+
 Once it's finished building, run the image. You'll want to expose port 5000 inside the container so you can access the web app.
+
 	`docker run -d --name {choose name here} -p {any port}:5000 {image name}`
+
 Now if you go to "localhost:{port you chose}" in your web browser you should see the webpage.
 
 #### Web App
@@ -34,6 +38,6 @@ You should see a webpage titled "ACP Brevet Times" and a table with the columns 
 
 When you input a distance into "Miles" or "Km", the app should automatically fill the other column, and calculate the opening and closing times. You can change the total brevet distance with the dropdown menu to the upper left, and the beginning date and time with the menu to the upper right.
 
-	* Remember that when typing in input fields, you'll have to click somewhere on the page or press enter to get a response.
+* Remember that when typing in input fields, you'll have to click somewhere on the page or press enter to get a response.
 
 It is intended that inputted control distances be within the brevet distance selected, and in ascending order. If you input control distances greater than the brevet distance, or give a control a distance that is lower than that of the control immediately before it, the app will show you non-disruptive "error" messages under the "notes" column.
