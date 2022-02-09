@@ -7,7 +7,7 @@ and https://rusa.org/pages/rulesForRiders
 import arrow
 
 
-min_speeds = { 60: 20, 200: 15, 400: 15, 600: 15, 1000: 11.428, 1300: 13.333 }
+min_speeds = { 60: 20, 600: 15, 1000: 11.428, 1300: 13.333 }
 max_speeds = { 200: 34, 400: 32, 600: 30, 1000: 28, 1300: 26 }
 
 def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
@@ -38,7 +38,7 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
             t[1] += q[1]
             cut = bracket
 
-    rt = arrow.get(brevet_start_time).shift(hours=+t[0], minutes=+round(t[1]*60, 0))
+    rt = brevet_start_time.shift(hours=+t[0], minutes=+round(t[1]*60, 0))
     
     return rt
 
@@ -56,16 +56,25 @@ def close_time(control_dist_km, brevet_dist_km, brevet_start_time):
        This will be in the same time zone as the brevet start time.
     """
     
-    t = (0, 0)
+    t = [0, 0]
     dist = divmod(control_dist_km, 1)[0]
+    cut = 0
     for bracket, speed in min_speeds.items():
         if dist <= bracket:
-            t = divmod(dist / speed, 1)
+            q = divmod((dist - cut) / speed, 1)
+            t[0] += q[0]
+            t[1] += q[1]
+            if bracket == 60:
+                t[0] += 1
             break
-    
-    if dist <= 60:
-        t = (t[0] + 1, t[1])
+        else:
+            q = divmod((bracket - cut) / speed, 1)
+            t[0] += q[0]
+            t[1] += q[1]
+            if bracket == 60:
+                t[0] += 1
+            cut = bracket
 
-    rt = arrow.get(brevet_start_time).shift(hours=+t[0], minutes=+round(t[1]*60, 0))
+    rt = brevet_start_time.shift(hours=+t[0], minutes=+round(t[1]*60, 0))
     
     return rt

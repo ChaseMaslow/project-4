@@ -58,8 +58,8 @@ def _calc_times():
     app.logger.debug(f"begin={begin}")
     app.logger.debug("request.args: {}".format(request.args))
 
-    open_time = acp_times.open_time(km, br, begin).format('YYYY-MM-DDTHH:mm')
-    close_time = acp_times.close_time(km, br, begin).format('YYYY-MM-DDTHH:mm')
+    open_time = acp_times.open_time(km, br, arrow.get(begin)).format('YYYY-MM-DDTHH:mm')
+    close_time = acp_times.close_time(km, br, arrow.get(begin)).format('YYYY-MM-DDTHH:mm')
     result = {"open": open_time, "close": close_time}
     return flask.jsonify(result=result)
 
