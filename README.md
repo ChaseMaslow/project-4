@@ -1,66 +1,39 @@
-# UOCIS322 - Project 4 #
-You'll learn how to write test cases and test your code, along with more JQuery.
+# UOCIS - Project 4
+### Description
+This is a Flask app designed to replace the [ACP Brevet Control calculator](https://rusa.org/octime_acp.html) found on the Randonneurs USA official website. Instead of being built around form entry as the input method, this web page responds to user input live, with no redirects or refreshes required, and displays calculated control times. The calculator accepts miles or kilometers, and does conversions automatically.
 
-## Overview
+### How it Works
+The algorithm used here is based on the information on the Randonneurs USA website, and what their calculator spits out. They have an informational page about that [here](https://rusa.org/pages/acp-brevet-control-times-calculator). On that page, there's a table of minimum and maximum speeds for different locations.
 
-You will reimplement RUSA ACP controle time calculator with Flask and AJAX.
-> That's *"controle"* with an *e*, because it's French, although "control" is also accepted. Controls are points where a rider must obtain proof of passage, and control[e] times are the minimum and maximum times by which the rider must arrive at the location.
+* To calculate a control's opening time, we use the maximum speed of every range preceding its location, summing together the expected traversal time for someone moving at maximum speed. For the closing time, we use just the minimum speed of the bracket the control falls within.
+	* For example: A control at 550km opens at 200/34 + 200/32 + 150/30 = 17H08, and closes at 550/15 = 36H40.
 
-### ACP controle times
+My program has an internal copy of this table, with an additional bracket added to account for the more recent rule that relaxes closing times within the first 60km. For such controls, the minimum speed is treated as 20km/hr, and one hour is added to the time.
 
-This project consists of a web application that is based on RUSA's online calculator. The algorithm for calculating controle times is described here [https://rusa.org/pages/acp-brevet-control-times-calculator](https://rusa.org/pages/acp-brevet-control-times-calculator). Additional background information is given here [https://rusa.org/pages/rulesForRiders](https://rusa.org/pages/rulesForRiders). The description is ambiguous, but the examples help. Part of finishing this project is clarifying anything that is not clear about the requirements, and documenting it clearly. 
+The table in the webpage is operated by a Javascript (+JQuery) front-end, while the algorithm is contained in the Python (+Flask) back-end. 
 
-We are essentially replacing the calculator here [https://rusa.org/octime_acp.html](https://rusa.org/octime_acp.html). We can also use that calculator to clarify requirements and develop test data. 
+##### Modules Used
+	Flask, Arrow, Nose (testing)
+	JQuery, Moment
 
-## Tasks
+##### Author Info
+	Chase Maslow
+	chasemaslow@gmail.com
 
-* Implement the logic in `acp_times.py` based on the algorithm linked above.
+## How to start
 
-* Create test cases using the original website, and write test suites for your project.
-	* Based on what was discussed in the lecture, create test cases, try them in the original website, and check if your functions correctly calculate the times.
-	* This will effectively replicate the calulator above.
+#### Docker 
+Go into your terminal or shell and navigate to the /brevets directory. With Docker installed, enter:
+	`docker build -t {choose name here} .`
+Once it's finished building, run the image. You'll want to expose port 5000 inside the container so you can access the web app.
+	`docker run -d --name {choose name here} -p {any port}:5000 {image name}`
+Now if you go to "localhost:{port you chose}" in your web browser you should see the webpage.
 
-* Edit the template and Flask app so that the required remaining arugments are passed along.
-	* Currently the miles to kilometers (and some other basic stuff) is implemented with AJAX. 
-	* The remainder is left to you.
+#### Web App
+You should see a webpage titled "ACP Brevet Times" and a table with the columns "Miles", "Km", "Location", and so on.
 
-* As always, revise the README file, and add your info to `Dockerfile`. These have points!
-	* **NOTE:** This time, you should outline the application, the algorithm, and how to use start (docker instructions, web app instructions). **Make sure you're thorough, otherwise you may not get all the points.**
+When you input a distance into "Miles" or "Km", the app should automatically fill the other column, and calculate the opening and closing times. You can change the total brevet distance with the dropdown menu to the upper left, and the beginning date and time with the menu to the upper right.
 
-* As always, submit your `credentials.ini` through Canvas. It should contain your name and git repo URL.
+	* Remember that when typing in input fields, you'll have to click somewhere on the page or press enter to get a response.
 
-### Testing
-
-A suite of nose test cases is a requirement of this project. Design the test cases based on an interpretation of rules here [https://rusa.org/pages/acp-brevet-control-times-calculator](https://rusa.org/pages/acp-brevet-control-times-calculator). Be sure to test your test cases: You can use the current brevet time calculator [https://rusa.org/octime_acp.html](https://rusa.org/octime_acp.html) to check that your expected test outputs are correct. While checking these values once is a manual operation, re-running your test cases should be automated in the usual manner as a Nose test suite.
-
-To make automated testing more practical, your open and close time calculations should be in a separate module. Because I want to be able to use my test suite as well as yours, I will require that module be named `acp_times.py` and contain the two functions I have included in the skeleton code (though revised, of course, to return correct results).
-
-We should be able to run your test suite by changing to the `brevets` directory and typing `nosetests`. All tests should pass. You should have at least 5 test cases, and more importantly, your test cases should be chosen to distinguish between an implementation that correctly interprets the ACP rules and one that does not.
-
-## Grading Rubric
-
-* If your code works as expected: 100 points. This includes:
-
-	* Completing the frontend in `calc.html`.
-	
-	* Completing the Flask app accordingly (`flask_brevets.py`).
-	
-	* Implementing the logic in `acp_times.py`.
-	
-	* Updating `README` with a clear specification.
-	
-	* Writing at least **five** correct tests using nose (put them in `tests`, follow Project 3 if necessary) and all pass.
-
-* If the algorithm is incorrect, 25 points will be docked off.
-
-* If the webpage does not work as expected (JQuery or Flask failing to correctly fill in the information, etc.), 25 points will be docked off.
-
-* If the test cases are missing/not functional/do not all pass, 5 points will be docked off per each (25 points total).
-
-* If `README` is not clear, missing or not edited, or `Dockerfile` is not updated, up to 15 points will be docked off.
-
-* If none of the functionalities work, 10 points will be given assuming `credentials.ini` is submitted with the correct repo URL, and `Dockerfile` builds and runs without any errors. 
-
-## Authors
-
-Michal Young, Ram Durairajan. Updated by Ali Hassani.
+It is intended that inputted control distances be within the brevet distance selected, and in ascending order. If you input control distances greater than the brevet distance, or give a control a distance that is lower than that of the control immediately before it, the app will show you non-disruptive "error" messages under the "notes" column.

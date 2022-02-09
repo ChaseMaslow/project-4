@@ -114,17 +114,20 @@
          <script type="text/javascript">
             var SCRIPT_ROOT = {{ request.script_root|tojson|safe }} ;
             var TIME_CALC_URL = SCRIPT_ROOT + "/_calc_times";
+			
+			var EXCEEDS_MESSAGE = "Error: Control distance exceeds brevet distance!".replaceAll(" ", "&nbsp;");
+			var WRONG_ORDER_MESSAGE = "Error: Not in ascending order!".replaceAll(" ", "&nbsp;");
 
-            // FIX ME!
-            // Right now, only the kilometers are passed
-            // you need to pass much more!
-            // View flask_brevets.py for details.
+
             function calc_times(control) {
-              var km = control.find("input[name='km']").val();
+              var km = parseFloat(control.find("input[name='km']").val());
+			  var brevet_dist_km = parseInt($("#brevet_dist_km").val());
+			  var begin = $("#begin_date").val();
               var open_time_field = control.find("input[name='open']");
               var close_time_field = control.find("input[name='close']");
 
-              $.getJSON(TIME_CALC_URL, {km: km}).done(
+              $.getJSON(TIME_CALC_URL, {km: km, 
+			  brevet_dist_km: brevet_dist_km, begin_date: begin}).done(
                 function(data) {
                    var times = data.result;
                    console.log("Got a response: ");
@@ -140,9 +143,43 @@
                  console.log(err);
                });
             }
+			
+			function check_distances(control, brevet_dist_km) {
+				var km = parseFloat(control.find("input[name='km']").val());
+				if (km > brevet_dist_km) {
+					console.log("Error: " + km + " > " + brevet_dist_km);
+					control.find(".notes").html(EXCEEDS_MESSAGE);
+					return true;
+				} else {
+					control.find(".notes").html("");
+					return false;
+				}
+			}
+			
+			function compare_distances(control) {
+				var km = parseFloat(control.find("input[name='km']").val());
+				var last = parseFloat(control.prev().find("input[name='km']").val());
+				if (km < last) {
+					control.find(".notes").html(WRONG_ORDER_MESSAGE);
+					return true;
+				} else {
+					return false;
+				}
+			}
 
             $(document).ready(function(){
              // Do the following when the page is finished loading
+
+				$("#brevet_dist_km").change(
+				   function() {
+						console.log("Distance changed");
+						var br = $(this).val();
+						$(".control").each(function () {
+							if (!check_distances($(this), br)) {
+								compare_distances($(this));
+							}
+						});
+					});
 
                 $('input[name="miles"]').change(
                    function() {
@@ -152,6 +189,11 @@
                        var control_entry = $(this).parents(".control")
                        var target = control_entry.find("input[name='km']");
                        target.val( km );
+					   // Check for mistakes in input
+					   var br = parseInt($("#brevet_dist_km").val());
+					   if (!check_distances(control_entry, br)) {
+							compare_distances(control_entry);
+					   }
                        // Then calculate times for this entry
                        calc_times(control_entry);
                     });
@@ -164,6 +206,11 @@
                        var control_entry = $(this).parents(".control")
                        var target = control_entry.find("input[name='miles']");
                        target.val( miles );
+					   // Check for mistakes in input
+					   var br = parseInt($("#brevet_dist_km").val());
+					   if (!check_distances(control_entry, br)) {
+							compare_distances(control_entry);
+					   }
                        // Then calculate times for this entry
                        calc_times(control_entry);
                     });
