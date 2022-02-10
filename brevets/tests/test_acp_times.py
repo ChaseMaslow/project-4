@@ -54,6 +54,15 @@ def test_600():
         assert ct == expected_times[c][1]
 
 
+def test_time_limits():
+    start_time = arrow.now()
+    assert close_time(205, 200, start_time) == start_time.shift(hours=+13, minutes=+30)
+    assert close_time(305, 300, start_time) == start_time.shift(hours=+20)
+    assert close_time(405, 400, start_time) == start_time.shift(hours=+27)
+    assert close_time(605, 600, start_time) == start_time.shift(hours=+40)
+    assert close_time(1005, 1000, start_time) == start_time.shift(hours=+75)
+
+
 def test_relaxed_close():
     start_time = arrow.now()
     ct = close_time(20, 200, start_time)
