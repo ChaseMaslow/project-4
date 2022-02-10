@@ -34,6 +34,11 @@ def open_time(control_dist_km, brevet_dist_km, brevet_start_time):
             t[0] += q[0]
             t[1] += q[1]
             break
+        elif bracket == brevet_dist_km:
+            q = divmod((bracket - cut) / speed, 1)
+            t[0] += q[0]
+            t[1] += q[1]
+            break
         else:
             q = divmod((bracket - cut) / speed, 1)
             t[0] += q[0]

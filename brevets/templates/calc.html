@@ -146,7 +146,7 @@
 			
 			function check_distances(control, brevet_dist_km) {
 				var km = parseFloat(control.find("input[name='km']").val());
-				if (km > brevet_dist_km) {
+				if (km > brevet_dist_km*1.2) {
 					console.log("Error: " + km + " > " + brevet_dist_km);
 					control.find(".notes").html(EXCEEDS_MESSAGE);
 					return true;

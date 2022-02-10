@@ -76,3 +76,10 @@ def test_truncate():
     ct = close_time(38.624256, 200, start_time)
     assert ot == start_time.shift(hours=+1, minutes=+7)
     assert ct == start_time.shift(hours=+2, minutes=+54)
+
+
+def test_feedback():
+    assert open_time(205, 200, arrow.get("2011-02-21T12:30")).format("YYYY-MM-DDTHH:mm") == arrow.get("2011-02-21T18:23").format("YYYY-MM-DDTHH:mm")
+    assert open_time(470, 400, arrow.get("2001-10-21T05:40")).format("YYYY-MM-DDTHH:mm") == arrow.get("2001-10-21T17:48").format("YYYY-MM-DDTHH:mm")
+    assert open_time(700, 600, arrow.get("2001-10-21T14:00")).format("YYYY-MM-DDTHH:mm") == arrow.get("2001-10-22T08:48").format("YYYY-MM-DDTHH:mm")
+    assert open_time(1140, 1000, arrow.get("2011-10-21T11:00")).format("YYYY-MM-DDTHH:mm") == arrow.get("2011-10-22T20:05").format("YYYY-MM-DDTHH:mm")
